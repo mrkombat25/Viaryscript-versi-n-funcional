@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ViaryScript Playground</title>
+  <style>
+    body { font-family: sans-serif; background: #f0f0f0; padding: 20px; }
+    textarea { width: 100%; height: 150px; font-family: monospace; font-size: 14px; }
+    button { margin-top: 10px; padding: 10px 20px; font-size: 16px; }
+    pre { background: #222; color: #0f0; padding: 10px; margin-top: 10px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+
+  <h2>ViaryScript Playground</h2>
+  <textarea id="editor" placeholder="Escribe tu código aquí..."></textarea>
+  <br>
+  <button onclick="ejecutarViaryScript()">Ejecutar Código</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    function ejecutarViaryScript() {
+      const codigo = document.getElementById("editor").value;
+      const lineas = codigo.split("\n");
+      let resultado = "";
+      let ejecutando = false;
+      let mensajes = [];
+
+      for (let linea of lineas) {
+        linea = linea.trim();
+
+        // Ignorar comentarios
+        if (linea.startsWith("#")) continue;
+
+        // Activar ejecución
+        if (linea === "Runcode") {
+          ejecutando = true;
+          continue;
+        }
+
+        if (ejecutando) {
+          // Guardar mensajes personalizados
+          if (linea.includes(".")) {
+            const partes = linea.split(".");
+            const nombre = partes[0];
+            const variable = partes[1];
+            mensajes.push({ nombre, variable });
+          }
+
+          // Ejecutar Print y mostrar solo los nombres que coincidan con la variable
+          if (linea.startsWith("Print(")) {
+            const match = linea.match(/Print\("(.+?)"\)/);
+            if (match) {
+              const variableBuscada = match[1];
+              for (let msg of mensajes) {
+                if (msg.variable === variableBuscada) {
+                  resultado += msg.nombre + "\n";
+                }
+              }
+            }
+          }
+        }
+      }
+
+      document.getElementById("output").textContent = resultado;
+    }
+  </script>
+
+</body>
+</html>
